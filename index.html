@@ -7,12 +7,13 @@
         body {
             font-family: sans-serif;
             display: flex;
+            flex-direction: column; /* Changed to column for vertical stacking */
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
             background-color: #f4f4f9;
-            gap: 20px; /* Space between the two containers */
+            /* gap: 20px; Removed gap as it's for horizontal spacing */
         }
         .container {
             text-align: center;
@@ -21,6 +22,7 @@
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             width: 450px; /* Adjusted width for each container */
+            margin-bottom: 20px; /* Added margin for spacing between vertical containers */
         }
         h1 {
             color: #333;
