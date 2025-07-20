@@ -7,13 +7,21 @@
         body {
             font-family: sans-serif;
             display: flex;
-            flex-direction: column; /* Changed to column for vertical stacking */
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh; /* height を min-height に変更 */
             margin: 0;
             background-color: #f4f4f9;
-            /* gap: 20px; Removed gap as it's for horizontal spacing */
+            padding-top: 50px; /* 新しく追加: 上部に余白を作成してURLバーとの重なりを防ぐ */
+            box-sizing: border-box; /* padding を含めて要素のサイズを計算 */
+        }
+        /* 新しく追加するタイトル用のスタイル */
+        .main-title {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-align: center;
         }
         .container {
             text-align: center;
@@ -21,8 +29,8 @@
             padding: 40px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            width: 450px; /* Adjusted width for each container */
-            margin-bottom: 20px; /* Added margin for spacing between vertical containers */
+            width: 450px;
+            margin-bottom: 20px;
         }
         h1 {
             color: #333;
@@ -54,7 +62,7 @@
             font-size: 18px;
             font-weight: bold;
             color: #555;
-            min-height: 50px; /* Ensure space for theme text */
+            min-height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -86,7 +94,7 @@
     </style>
 </head>
 <body>
-
+    <h1 class="main-title">横浜市教員採用試験お題生成メーカー＆タイマー</h1>
     <div class="container">
         <h1>お題メーカー</h1>
 
