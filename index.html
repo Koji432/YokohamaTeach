@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>横浜市教採お題メーカー＆タイマー</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+            gap: 20px; /* Space between the two containers */
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 450px; /* Adjusted width for each container */
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .selection, .result {
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #themes {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #555;
+            min-height: 50px; /* Ensure space for theme text */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .timer-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        #timerDisplay {
+            font-size: 3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .timer-label {
+            font-size: 1.2em;
+            color: #555;
+            margin-top: -10px;
+            margin-bottom: 20px;
+        }
+        .timer-controls button {
+            margin: 5px;
+            padding: 10px 20px;
+        }
+        #timerDisplay.warning {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>お題メーカー</h1>
+
+        <div class="selection">
+            <h2>科目設定</h2>
+            <input type="radio" id="math" name="subject" value="math" checked>
+            <label for="math">中学・数学</label>
+            <input type="radio" id="tech" name="subject" value="tech">
+            <label for="tech">技術</label>
+            <input type="radio" id="info" name="subject" value="info">
+            <label for="info">情報</label>
+            <input type="radio" id="inds" name="subject" value="inds">
+            <label for="inds">工業</label>
+        </div>
+
+        <button id="generateBtn">お題を生成</button>
+
+        <div class="result">
+            <h2>生成されたお題</h2>
+            <div id="themes">
+                <p>ボタンを押して、お題を生成してください。</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>模擬授業タイマー</h1>
+        <div class="timer-section">
+            <div id="timerDisplay">
+                <p>05:00</p>
+                <p class="timer-label">授業準備・検討(5分)</p>
+            </div>
+            <div class="timer-controls">
+                <button id="startPauseBtn">スタート</button>
+                <button id="resetBtn">リセット</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 各科目のテーマリスト
+        const themes = {
+            math: [
+                '数と式', '正負の数', '文字式', '一元一次方程式', '二元一次方程式(連立方程式)', 
+                '方程式', '式の展開', '因数分解', '二次方程式','図形', '平面図形','平行線や角', '空間図形', '図形の合同', 
+                '図形の証明', '相似', '合同', '円周角', '三平方の定理', '比例・反比例', '座標',
+                '一次関数', '関数y=ax^2', '関数', 'データ', '四分位範囲', '箱ひげ図', 
+                '確率', '標本調査'
+            ],
+            tech: [
+                '材料', '加工', '製品の構造', '安全適切な製作(材料)', '肥料', '栽培', 
+                '飼育', '生物の成長', '生物の管理', '電気', '保守点検', '発電', 
+                '運動', 'エネルギー', '機械', '安全適切な製作(エネ)', 'コンピュータ', 
+                'ネットワーク', 'デジタル化', '生成AI', '情報モラル', 'セキュリティ'
+            ],
+            info: [
+                '情報産業と社会', '情報の表現' ,'情報デザイン', '情報セキュリティ', '情報システム', 'プログラミング',
+                'ネットワークシステム', 'データベース' , 'コンテンツ', 'メディアとサービス' , '人工知能' ,'機械学習',
+                'データサイエンス', 'コンピュータ', '開発手法', 'データ構造とアルゴリズム', '制作のプロセス'
+            ],
+            inds: [
+                '技術基礎','情報数理','製図','材料技術','管理技術','環境技術','機械工作','機械設計','原動機',
+                '電子機械', '生産技術','自動車工学','自動車整備','電気回路','電気機器','電力技術', '電子技術',
+                '電子回路', '電子電子計測制御','通信技術','プログラミング','ハードウェア','ソフトウェア','建築構造',
+                '建築計画','建築構造設計','設備計画','衛生・防災','測量','電子回路', '土木基盤力学','土木構造設計', 
+                '工業化学','化学工学','地球環境科学','材料工学','材料加工','セラミック','繊維','染織','インテリア',
+                'デザイン','デザイン材料','デザイン史',
+            ],
+            common: [
+                '友情', '感謝', 'チームワーク', '夏休み', '情報社会', '礼儀', 
+                '相互理解', '自然愛護', '自主・自律', '向上心', '希望と勇気', 
+                '家族愛', '学校生活', '郷土の伝統と文化', '国際理解', '公共の精神', 
+                '勤労', '夢','個性','親切'
+            ]
+        };
+
+        // HTML要素を取得
+        const generateBtn = document.getElementById('generateBtn');
+        const themesDiv = document.getElementById('themes');
+
+        // 配列からランダムに指定された数の要素を取得する関数
+        function getRandomElements(arr, n) { 
+            const result = new Set();
+            while (result.size < n) {
+                const randomIndex = Math.floor(Math.random() * arr.length);
+                result.add(arr[randomIndex]);
+            }
+            return Array.from(result);
+        }
+
+        // お題を生成して表示する関数
+        function generateThemes() {
+            // 選択されている科目を取得
+            const selectedSubject = document.querySelector('input[name="subject"]:checked').value;
+
+            // 各リストからテーマをランダムに選択
+            const subjectThemes = getRandomElements(themes[selectedSubject], 2);
+            const commonTheme = getRandomElements(themes.common, 1);
+
+            // 選択されたテーマを結合
+            const allThemes = [...subjectThemes, ...commonTheme];
+            
+            // 結果を表示
+            themesDiv.innerHTML = `<p>${allThemes.join(' / ')}</p>`;
+        }
+
+        // ボタンがクリックされた時にお題を生成する
+        generateBtn.addEventListener('click', generateThemes);
+        
+        const timerDisplay = document.getElementById('timerDisplay');
+        const startPauseBtn = document.getElementById('startPauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        let timerInterval;
+        let totalSeconds = 300; // 5分 = 300秒 (授業準備・検討)
+        let isRunning = false;
+        let currentPhase = 'preparation'; // 'preparation' (授業準備・検討) or 'execution' (授業実施)
+
+        // タイマー表示を更新する関数
+        function updateTimerDisplay() {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            timerDisplay.innerHTML = `
+                <p>${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}</p>
+                <p class="timer-label">${currentPhase === 'preparation' ? '授業準備・検討(5分)' : '授業実施(10分)'}</p>
+            `;
+
+            if (totalSeconds <= 60 && totalSeconds > 0) { // 残り時間が60秒以下で0秒より大きい場合
+                timerDisplay.classList.add('warning');
+            } else {
+                timerDisplay.classList.remove('warning');
+            }
+        }
+
+        // タイマーを開始・一時停止する関数
+        function startPauseTimer() {
+            if (isRunning) {
+                clearInterval(timerInterval);
+                startPauseBtn.textContent = '再開';
+            } else {
+                timerInterval = setInterval(() => {
+                    if (totalSeconds > 0) {
+                        totalSeconds--;
+                        updateTimerDisplay();
+                    } else {
+                        // タイマーが0になったら次のフェーズに移行
+                        if (currentPhase === 'preparation') {
+                            currentPhase = 'execution';
+                            totalSeconds = 600; // 10分 = 600秒 (授業実施)
+                        } else {
+                            // 全てのフェーズが終了したらタイマーを停止
+                            clearInterval(timerInterval);
+                            startPauseBtn.textContent = 'スタート';
+                            isRunning = false;
+                            alert('タイマーが終了しました！');
+                        }
+                        updateTimerDisplay();
+                    }
+                }, 1000);
+                startPauseBtn.textContent = '一時停止';
+            }
+            isRunning = !isRunning;
+            updateTimerDisplay();
+        }
+
+        // タイマーをリセットする関数
+        function resetTimer() {
+            clearInterval(timerInterval);
+            totalSeconds = 300; // 初期値は授業準備・検討の5分
+            isRunning = false;
+            currentPhase = 'preparation';
+            startPauseBtn.textContent = 'スタート';
+            updateTimerDisplay(); // リセット時も色をリセットするため呼び出す
+        }
+
+        // イベントリスナー
+        startPauseBtn.addEventListener('click', startPauseTimer);
+        resetBtn.addEventListener('click', resetTimer);
+
+        // 初期表示
+        updateTimerDisplay();
+    </script>
+</body>
+</html>
